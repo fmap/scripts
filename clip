@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# interface to xclip
+
+case "$#" in
+  0) read input ;;
+  *) input="$@" ;;
+esac
+
+if ! [[ -e input ]]; then
+  echo "$input" | xclip -selection clipboard
+  echo "$input" | xclip -selection XA_primary
+fi
