@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+export TODO="$HOME/root/notes.old/todo.txt"
+
+add() {
+  echo "$@" >> $TODO
+}
+
+remove() {
+  sed -i -e "/$*/d" "$TODO"
+}
+
+
+edit() {
+  $EDITOR "$TODO"
+}
+
+list() {
+  cat "$TODO"
+}
+
+case "$1" in
+  add)  shift; add "$@"    ;;
+  rm)   shift; remove "$@" ;;
+  edit) edit               ;;
+  *)    list               ;;
+esac

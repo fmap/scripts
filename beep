@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+heylisten() { 
+  mplayer "$HOME/usr/share/sounds/heylisten.mp3" &> /dev/null 
+}
+
+loop() { 
+  while true; do
+    $2 && sleep $1; 
+  done 
+}
+
+[[ -e "$@" ]] && t=1 || t="$@"
+sleep "$(( $t*60 ))" && loop 20 heylisten

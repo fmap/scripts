@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+API_URL="http://keep.aineko/page/new"
+BOOKMARK_URL="$1"
+USERNAME="irving"
+PASSWORD="$(cat "$HOME/.security/keep/irving.pass")" # This quoting doesn't break anything!
+
+curl --data "username=${USERNAME}&password=${PASSWORD}&url=${BOOKMARK_URL}" "$API_URL"

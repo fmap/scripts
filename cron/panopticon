@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+locked() {
+  ps aux | grep -v grep | grep -q slock
+}
+
+if ! locked; then
+  SCREENSHOT_DIR="$HOME/usr/share/cron/data/scrot/$(date +%Y-%m-%d)"
+  [[ -d "$SCREENSHOT_DIR" ]] || mkdir -p "$SCREENSHOT_DIR"
+
+  SCREENSHOT_NUMBER="$(date +%H%M)"
+  DISPLAY=':0' scrot "${SCREENSHOT_DIR}/${SCREENSHOT_NUMBER}.png"
+fi

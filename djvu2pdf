@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+FILE="$@"; 
+convert "$FILE" -compress Group4 "${FILE/.djvu/.pdf}"

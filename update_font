@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Switch fonts at runtime.
+
+case $TERM in
+  rxvt*|screen*)
+    printf '\33]50;'$*'\007' ;;
+esac

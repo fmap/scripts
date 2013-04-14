@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Generate an animated GIF from image files.
+
+filename="$(date +%s).gif"
+convert -quiet -delay 20 -loop 0 -resize 500 $* "$filename"
+echo "$(pwd)/$filename"

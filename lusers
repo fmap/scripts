@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+gawk -F: '{ print $1 }' /etc/passwd

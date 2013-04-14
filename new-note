@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# kai is silly
+
+DIRNAME="$HOME/root/notes"
+[[ -d "$DIRNAME" ]] || mkdir -p "$DIRNAME"
+FILENAME="${1:-$(date +%s)}.txt"
+$EDITOR "${DIRNAME}/${FILENAME}"

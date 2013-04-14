@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+TRASH=("$HOME/Desktop" "$HOME/Documents" "$HOME/Downloads")
+for DIR in "${TRASH}[$@]}"; do
+  [[ -d "$DIR" ]] && rm -fr "$DIR"
+done

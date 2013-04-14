@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Password-based file decryption.
+
+gpg --no-options "$1"

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+source "$HOME/.security/rhul/Tenoke"
+
+case "$1" in 
+  start)
+    f5fpc -s -t webvpn.rhul.ac.uk -u "$USERNAME" -p "$PASSWORD" &>/dev/null;;
+  status)
+    f5fpc -i | head -n1;;
+  stop)
+    f5fpc -o &>/dev/null;;
+  *)
+    echo "?"; exit 1
+esac

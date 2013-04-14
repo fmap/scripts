@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Create a 'tar.gz' archive from a directory.
+
+tar cvzf "${1}.tar.gz"  "${1}/";

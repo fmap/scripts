@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# play music
+  
+mproperty() { 
+  mutagen-inspect "$2" | grep -aE "$1" | tail -n1 | sed -e 's/^.*=//';
+}
+
+scrobble() {
+  logfile="$HOME/var/log/music/play.log"
+  echo "$(date +%s),$(track),$(artist),$(album),$(year)" >> "$logfile" 
+}
+
+true && for filename in "$@"; do
+  [[ $? == 1 ]] && exit
+
+  track()  { mproperty 'title|TIT2|nam'  "$filename"; } # `eq` track="$(mproperty 'title|TIT2|nam' "$filename")"
+  artist() { mproperty 'artist|TPE1|ART' "$filename"; }
+  album()  { mproperty 'album|TALB|alb'  "$filename"; }
+  year()   { mproperty 'date|TDRC|day'   "$filename"; }
+
+  if [[ -z "$(track)" || -z "$(artist)" ]]; then
+    echo "Unknown: $(basename "$filename")"
+#   don't scrobble
+  else
+    echo "$(artist) - $(track)" 
+    scrobble 
+  fi
+  mplayer -really-quiet -novideo "$filename" 2>/dev/null
+done

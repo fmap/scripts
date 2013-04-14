@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Password-based file encryption.
+
+gpg -ac --no-options "$1"

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+mplayer -really-quiet "http://somafm.com/startstream=${1}.pls"

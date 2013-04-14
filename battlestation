@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+xkb() {
+  setxkbmap -option &&
+  setxkbmap -option caps:escape && 
+  [[ "$1" == "-swap" ]] && setxkbmap -option altwin:swap_alt_win;
+}
+
+kgrep() { 
+  ps xu | grep -v grep | grep "$1" | awk '{ print $2 }' | xargs -r kill
+}
+
+restart_xmonad() {
+  kgrep "status.sh" 
+  kgrep "dzen" 
+  xmonad --restart;
+}
+
+wallpaper() {
+  local wallpaper="sleep_of_reason.jpg"
+  feh --bg-fill "$HOME/usr/share/wallpapers/${1}/${wallpaper}"
+}
+
+xrandr_mode() {
+  xrandr --output default --mode "$1";
+}
+
+case "$1" in
+  room)
+    xkb -swap; 
+    xrandr_mode "1024x768";
+    wallpaper "1366x768";
+    restart_xmonad;
+    ;;
+  office)
+    xkb -swap; 
+    xrandr_mode "1920x1080";
+    wallpaper "1920x1080";
+    restart_xmonad;
+    ;;
+  lap)
+    xkb; 
+    xrandr_mode "1024x768";
+    wallpaper "1366x768";
+    restart_xmonad;
+    ;;
+  *)
+    echo "$0 lap|room|office";
+esac

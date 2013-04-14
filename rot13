@@ -1,0 +1,15 @@
+#!/usr/bin/env runhaskell
+
+import qualified Data.Map as Map
+
+store :: [(Char,Char)]
+store = zip left right ++ zip right left
+  where right = ['a'..'m'] ++ ['A'..'M']
+        left  = ['n'..'z'] ++ ['N'..'Z']
+
+rot13 :: String -> String
+rot13 = (map rotate)
+  where rotate c = Map.findWithDefault c c $ Map.fromList store
+
+main :: IO ()
+main = interact rot13

@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby
+
+%w|pp cgi open-uri json nokogiri|.map &method(:require) and
+
+module DuckDuckGo
+  class Search
+    attr_accessor :query
+
+    def initialize query
+      @query = CGI.escape(query).split.join('+')
+      json = open("http://api.duckduckgo.com?q=#{@query}&format=json&no_redirect=1").read or fail "Can't contact to the server."
+      JSON.parse(json).each do |key,value|
+        self.class.send(:define_method, :"#{key.downcase}") { value }
+      end
+    end
+
+    def expanded_type
+     { 'A' => 'Article',  'D' => 'Disambiguation',
+       'C' => 'Category', 'N' => 'Name',
+       'E' => 'Exclusive' 
+     }[self.type]
+    end
+
+    def method_missing(identifier, *arguments, &block)
+      #   1. We have a CamelCase key we're looking up in snake_case form (related_topics)
+      #   2. We're looking to see if a key has content (has_type?)
+      maybe_camel_case = identifier.to_s.delete('_')
+      maybe_camel_case &&= maybe_camel_case.to_sym
+      maybe_camel_case ||= identifier
+      return send(maybe_camel_case) if respond_to?(maybe_camel_case)
+
+      maybe_key_query = identifier.to_s
+      super if maybe_key_query.sub!(/^has_/, '').nil? or 
+               maybe_key_query.sub!(/\?$/,   '').nil? 
+      maybe_key_query.delete!('_'); maybe_key_query.to_sym 
+      super if not respond_to?(maybe_key_query)
+      send(maybe_key_query).empty? ? false : true
+    end
+  end
+
+  class Printer < Search
+    def output(parts=[])
+      if has_abstract? and has_abstract_source? and has_abstract_url?
+        parts << abstract.lstrip
+        parts << ["#{abstract_source} - #{abstract_url}", pretty_related_topics(0)].join(', ')
+      elsif has_abstract_url? and has_abstract_source?
+        parts << ["#{abstract_source} - #{abstract_url}", pretty_related_topics(2)].join(', ')
+      elsif has_answer?
+        parts << Nokogiri::XML(answer).inner_text
+      elsif has_type? and expanded_type.eql?('Disambiguation')
+         parts << pretty_related_topics(2)
+      elsif has_redirect?
+        parts << redirect
+      else
+        parts << "http://duckduckgo.com?q=#{query}"
+      end; return parts
+    end
+
+    def pretty_related_topics(number)
+      topic_strings = []
+      related_topics.reject! { |topic| topic["FirstURL"] =~ %r|^http://duckduckgo\.com/c/| }
+      number > related_topics.length-1 && number = related_topics.length-1
+      related_topics[0..number].each do |topic| topic_strings <<
+        [ Nokogiri::XML(topic["Result"]).inner_text,
+          topic["FirstURL"]
+        ].join(' - ')
+      end and topic_strings.join(', ')
+    end
+  end
+end
+
+puts DuckDuckGo::Printer.new(ARGV[0]).output

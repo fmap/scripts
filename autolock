@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+ps aux | grep -v grep | grep -q slock
+[[ $? == 0 ]] || slock

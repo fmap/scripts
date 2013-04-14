@@ -1,0 +1,5 @@
+#!/bin/bash
+
+LOGFILE="$HOME/var/log/mail/offlineimap.log"
+[[ -n "$(pgrep offlineimap)" ]] || 
+  (date && offlineimap -o -u basic) >>"$LOGFILE" &

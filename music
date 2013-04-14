@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+if [[ "$1" == "-s" ]]; then
+  s="shuf -z"
+  shift;
+else
+  s="tee"
+fi
+
+find ~/usr/share/music/. -type f -print0 | grep -Eazi "${@:-*}" | grep -Eaz '(mp3|m4a|flac)$' | $s | xargs -0 play

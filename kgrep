@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+[[ -z "$1" ]] && exit
+ps xu | grep -v grep | grep "$NAME" | awk '{ print $2 }' | xargs -r kill;
