@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby 
+
+require 'cgi'
+
+ROOT      = "http://translate.google.com/translate?sl=auto&tl=en&u="
+PARAMETER = CGI::escape ARGV[0]
+
+puts ROOT + PARAMETER
