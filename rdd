@@ -1,4 +1,6 @@
-#!/usr/bin/env ruby -rnestful
+#!/usr/bin/env ruby 
+
+require 'nestful'
 
 class RDD
   def initialize url=ARGV[0]
