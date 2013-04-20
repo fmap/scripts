@@ -6,43 +6,49 @@ xkb() {
   [[ "$1" == "-swap" ]] && setxkbmap -option altwin:swap_alt_win;
 }
 
-kgrep() { 
-  ps xu | grep -v grep | grep "$1" | awk '{ print $2 }' | xargs -r kill
+exterminate() { 
+  for process in "$@"; do
+    ps xu | grep -v grep | grep "$process" | awk '{ print $2 }' | xargs -r kill
+  done
 }
 
-restart_xmonad() {
-  kgrep "status.sh" 
-  kgrep "dzen" 
-  xmonad --restart;
+xmonad() {
+  if [[ "$1" == "--restart" ]]; then
+    exterminate "status.sh" "dzen" 
+    "$HOME/.cabal/bin/xmonad" --restart;
+  else
+    "$HOME/.cabal/bin/xmonad" "$@";
+  fi
 }
 
 wallpaper() {
+  local resolution="$1"
   local wallpaper="sleep_of_reason.jpg"
-  feh --bg-fill "$HOME/usr/share/wallpapers/${1}/${wallpaper}"
+  feh --bg-fill "$HOME/usr/share/wallpapers/$resolution/$wallpaper"
 }
 
-xrandr_mode() {
-  xrandr --output default --mode "$1";
+monitor() {
+  xrandr --output default "$@";
 }
 
 case "$1" in
   room)
     xkb -swap; 
-    xrandr_mode "1024x768";
+    monitor --mode "1024x768";
     wallpaper "1366x768";
-    restart_xmonad;
+    xmonad --restart;
     ;;
   office)
     xkb -swap; 
-    xrandr_mode "1920x1080";
+    monitor --mode "1920x1080";
     wallpaper "1920x1080";
-    restart_xmonad;
+    xmonad --restart;
     ;;
   lap)
     xkb; 
-    xrandr_mode "1366x768";
+    monitor --mode "1366x768";
     wallpaper "1366x768";
-    restart_xmonad;
+    xmonad --restart;
     ;;
   *)
     echo "$0 lap|room|office";
