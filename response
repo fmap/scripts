@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+curl -Is "$1" | grep 'HTTP' | awk '{ print $2 }'
+
