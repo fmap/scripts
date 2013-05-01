@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+beep() {
+  date
+  echo "pomodoro $1"
+  mplayer "$HOME/usr/share/sounds/beep.mp3" &>/dev/null # WANT RING
+}
+
+pomodoro() {
+  [[ "$1" == "four" ]] && break=$((15*60)) || break=$((5*60))
+  beep "$1: work" && sleep $((25*60)) && beep "$1: break" && sleep $break
+  echo
+}
+
+while true; do
+  pomodoro "one"   && 
+  pomodoro "two"   && 
+  pomodoro "three" && 
+  pomodoro "four"
+done
