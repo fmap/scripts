@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+true && while [[ $? == 0 ]]; do "$@"; done
