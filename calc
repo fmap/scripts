@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# A simple and powerful calculator.
 
 case "$#" in
-  0) bc -l ;;
-  *) echo "$@" | bc -l;;
+  0) bc -lq ;; # stdin or interactive
+  *) echo "$@" | bc -l ;;
 esac
