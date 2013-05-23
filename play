@@ -13,7 +13,7 @@ wrap() {
 
 scrobble() {
   logfile="$HOME/var/log/music/play.log"
-  (date +%s; track; artist; album; year) | wrap \" | tr \\n , >> "$logfile"
+  (date +%s; track; artist; album; year) | wrap \" | tr \\n , | sed 's/,$/\n/' >> "$logfile"
 }
 
 true && for filename in "$@"; do
