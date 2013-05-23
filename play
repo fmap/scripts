@@ -5,9 +5,15 @@ mproperty() {
   mutagen-inspect "$2" | grep -aE "$1" | tail -n1 | sed -e 's/^.*=//';
 }
 
+wrap() {
+  while read line; do
+    echo "$1$line$1"
+  done
+}
+
 scrobble() {
   logfile="$HOME/var/log/music/play.log"
-  (date +%s; track; artist; album; year) | tr '\n' ',' >> "$logfile"
+  (date +%s; track; artist; album; year) | wrap \" | tr \\n , >> "$logfile"
 }
 
 true && for filename in "$@"; do
