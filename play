@@ -2,11 +2,11 @@
 # play music
   
 mproperty() { 
-  mutagen-inspect "$2" | awk "/$1/ {print \$2} {exit}"
+  mutagen-inspect "$2" | awk -F= "/$1/ {print \$2}" | sed q
 }
 
 tr() {
-  ruby -e "puts STDIN.read.tr(%Q'$1',%Q'$2')"
+  ruby -e "p STDIN.read.tr(%Q'$1',%Q'$2')"
 }
 
 scrobble() {
@@ -17,13 +17,13 @@ scrobble() {
 true; for filename in "$@"; do
   [[ $? == 1 ]] && exit
 
-  track()  { mproperty 'title|TIT2|nam'  "$filename"; }
-  artist() { mproperty 'artist|TPE1|ART' "$filename"; }
-  album()  { mproperty 'album|TALB|alb'  "$filename"; }
-  year()   { mproperty 'date|TDRC|day'   "$filename"; }
+  track  () { mproperty 'title|TIT2|nam'  "$filename"; }
+  artist () { mproperty 'artist|TPE1|ART' "$filename"; }
+  album  () { mproperty 'album|TALB|alb'  "$filename"; }
+  year   () { mproperty 'date|TDRC|day'   "$filename"; }
 
   if test "$(track)" -a "$(artist)" -a "$(album)" -a "$(year)"; then
-    echo "$(artist) - $(track)" 
+    echo "$(artist) - $(track)"
     scrobble 
   else
     echo "Unknown: $(basename "$filename")"
