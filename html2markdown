@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# eg. curl http://snowball.tartarus.org/algorithms/english/stemmer.html  | html2markdown
+
+pandoc -r html -w markdown 
