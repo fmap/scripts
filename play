@@ -5,13 +5,9 @@ mproperty() {
   mutagen-inspect "$2" | awk -F= "/$1/ {print \$2}" | sed q
 }
 
-tr() {
-  ruby -e "p STDIN.read.tr(%Q'$1',%Q'$2')"
-}
-
 scrobble() {
   logfile="$HOME/var/log/music/play.log"
-  (date +%s; track; artist; album; year) | tr ',\n' '，,' >> "$logfile"
+  (date +%s; track; artist; album; year) | tr '\n' $'\036' >> "$logfile"
 }
 
 true; for filename in "$@"; do
