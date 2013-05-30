@@ -7,7 +7,8 @@ mproperty() {
 
 scrobble() {
   logfile="$HOME/var/log/music/play.log"
-  (date +%s; track; artist; album; year) | tr '\n' $'\036' >> "$logfile"
+  (date +%s; track; artist; album; year) | tr '\n' $'\031' >> "$logfile"
+  echo -n $'\030' >> "$logfile"
 }
 
 true; for filename in "$@"; do
