@@ -1,0 +1,79 @@
+#!/usr/bin/env ruby
+# "Aziz, light!"
+# (11"MBA; JUNE 2012)
+
+class Display
+  def brightness
+    File.read(path).chomp.to_i
+  end
+  
+  def brightness=new
+    raise 'out of range' if not (0..max).include?(new)
+    File.open(path, 'w') do |device|
+      device.write new
+    end; brightness
+  end
+
+  def brighter
+    new = [brightness+interval, max].min
+    self.brightness = new
+  end
+
+  def dimmer
+    new = [brightness-interval, 0].max
+    self.brightness = new
+  end
+
+  private
+
+  def interval
+   50
+  end
+
+  def device
+    '/sys/class/backlight/intel_backlight/'
+  end
+
+  def path
+    File.join device, 'brightness'
+  end
+
+  def max
+    path = File.join device, 'max_brightness'
+    File.read(path).chomp.to_i
+  end
+end
+
+class Keyboard < Display
+  private
+
+  def interval
+    10
+  end
+
+  def device
+    '/sys/devices/platform/applesmc.768/leds/smc::kbd_backlight/'
+  end
+end
+
+require 'optparse'
+
+# When there are "conflicting" options, they're performed in the order they're input.
+OptionParser.new do |arguments|
+  arguments.on('--device [TYPE]', [:keyboard,:display], '[device]') do |device| 
+    # I'm not going to enforce this, but if this isn't present&first, die.
+    klass  = device.to_s.capitalize
+    @class = Object::const_get(klass).new
+  end
+  arguments.on('--brightness N', Integer, '') do |setting|
+    @class.brightness=setting
+  end
+  arguments.on('--brighter', '') do 
+    @class.brighter
+  end
+  arguments.on('--dimmer', '') do 
+    @class.dimmer
+  end
+end.parse!
+
+puts @class.brightness

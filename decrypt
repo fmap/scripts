@@ -1,4 +1,12 @@
-#!/usr/bin/env bash
-# Password-based file decryption.
+#!/bin/sh
+  
+ASC="$1"
+gpg "$ASC" || (echo "fail"; exit)
 
-gpg --no-options "$1"
+if [[ "${1:-4}" == ".zip.asc" ]]; then
+  ZIP="${ASC%.asc}"
+  unzip "$ZIP" &&
+  shred "$ZIP"
+fi
+
+shred "$ASC" && rm "$ASC"

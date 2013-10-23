@@ -1,4 +1,17 @@
-#!/usr/bin/env bash
-# Password-based file encryption.
+#!/bin/sh
 
-gpg -ac --no-options "$1"
+if [[ -d "$1" ]]; then
+  DIRECTORY="$1"
+  zip -r "$DIRECTORY" "$DIRECTORY" && 
+  gpg -ac "${DIRECTORY}.zip" &&
+  find "$DIRECTORY" -type f -print0 | xargs -0 shred && 
+  find "$DIRECTORY" -type f -print0 | xargs -0 rm && 
+  rm -rf "$DIRECTORY"
+  shred "${DIRECTORY}.zip" &&
+  rm "${DIRECTORY}.zip" 
+elif [[ -f "$1" ]]; then
+  FILE="$1"
+  gpg -ac "$FILE" &&
+  shred "$FILE" && 
+  rm "$FILE"
+fi

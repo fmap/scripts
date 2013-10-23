@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
 case "$#" in
-  0) bc -lq ;; # stdin or interactive
-  *) echo "$@" | bc -l ;;
+  0) bc -lq ;; 
+  *) bc -l <<<"$*" ;;
 esac

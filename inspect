@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-tr ':' '\n' <<<$PATH
+(head -n8; tail -n8)

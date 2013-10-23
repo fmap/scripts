@@ -11,8 +11,8 @@ if [ $0 == "bash" ]; then
   POMO() {
     WRK="$((25*60))"
     BEEP "$1:WRK"; sleep "$WRK"
-    BRK="$(ruby -e "p 60*(${1:-4}.eql?(4)?15:5)")"
-    BEEP "$1:BRK"; sleep $BRK
+    [[ $1 == 4 ]] && BRK=15 || BRK=5
+    BEEP "$1:BRK"; sleep $((60*BRK)
   }
 else
   true; while [[ $? == 0 ]]; do

@@ -1,0 +1,1 @@
+pacman -Qs | awk -F'[/ ]' '/local/ { print $2 }'

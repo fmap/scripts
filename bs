@@ -27,29 +27,42 @@ wallpaper() {
   feh --bg-fill "$HOME/usr/share/wallpapers/$resolution/$wallpaper"
 }
 
-monitor() {
-  xrandr --output default "$@";
+edp() {
+  xrandr --output eDP1 "$@";
 }
 
+dp1() {
+  xrandr --output DP1 "$@";
+}
+
+_dp1() {
+  # intel drivers are borked, we must trick them
+  local line="$(cvt $1 $2 | grep -i modeline | sed -r 's/^\w+//')"
+  local mode="$(cut -d\  -f1 <<<$line)"
+  xrandr --newmode $line
+  xrandr --addmode "DP1" $mode
+  xrandr --output "DP1" --mode $mode
+} 
+
+[[ "$0" == "bash" ]] && return
+
 case "$1" in
-  room)
+  desk)
     xkb -swap; 
-    monitor --mode "1024x768";
-    wallpaper "1366x768";
-    xmonad --restart;
-    ;;
-  office)
-    xkb -swap; 
-    monitor --mode "1920x1080";
+    _dp1 1920 1080;
+    dp1 --primary;
+    edp --auto --right-of DP1;
     wallpaper "1920x1080";
     xmonad --restart;
     ;;
   lap)
     xkb; 
-    monitor --mode "1366x768";
+    edp --mode "1366x768" --rotate normal;
+    dp1 --off;
     wallpaper "1366x768";
     xmonad --restart;
     ;;
   *)
-    echo "$0 lap|room|office";
+    echo "$0 [room|lap]";
+    ;;
 esac

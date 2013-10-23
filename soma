@@ -1,3 +1,9 @@
 #!/usr/bin/env bash
 
-mplayer -really-quiet "http://somafm.com/startstream=${1}.pls"
+if [[ -n  "$1" ]]; then
+  mplayer -playlist "http://somafm.com/startstream=$1.pls" 2>&1 | 
+  awk -F"'" '/ICY/ { print $2 }'
+else
+  curl -s somafm.com |
+  awk -F'"' '/cbshort/ { gsub("/",""); print $4 }' 
+fi

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+case $1 in
+  tr)   F='$2';;
+  al)   F='$4';;
+  yr)   F='$5';;
+  ar|*) F='$3';;
+esac; shift
+
+LG=$HOME/var/log/music/play.log
+ST=$(date +%s --date="$1")
+
+a0='BEGIN { FS="\031"; RS="\030" }'
+a1="\$1 >= $ST { print $F }"
+awk "$a0$a1" "$LG" | sort | uniq -c | sort -rn 

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+listing_matches?() {
+  ssh-add -l | grep -qPi "$@"
+}
+
+if listing_matches? '(?:[a-f0-9]{2}:){15}[a-f0-9]{2}'; then
+  echo 'SSH keys have already been loaded.'
+elif listing_matches? 'could not open a connection'; then
+  echo "Either the daemon isn't running, or it hasn't been configured properly."
+  eval `ssh-agent`
+  echo "Let's try again."
+  $0
+elif listing_matches? 'no identities'; then
+  echo "The daemon is running, but no identities are loaded."
+  find ~/.ssh -name 'id_*'  | grep -Ev '.pub$' | xargs ssh-add
+fi

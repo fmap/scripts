@@ -1,0 +1,16 @@
+#!/bin/sh
+
+state() {
+  setleds </dev/tty0 \
+    | awk '/leds/{print $6}'\
+    | grep -q on
+}
+
+flip() {
+  if `state`; 
+    then setleds -L -caps </dev/tty0 
+    else setleds -L +caps </dev/tty0
+  fi
+}
+
+flip

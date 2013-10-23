@@ -10,5 +10,4 @@ loop() {
   done 
 }
 
-[[ -e "$@" ]] && t=1 || t="$@"
-sleep "$(( $t*60 ))" && loop 20 heylisten
+sleep "$(( ${1:-0}*60 ))" && loop 20 heylisten

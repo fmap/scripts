@@ -5,7 +5,7 @@ locked() {
 }
 
 if ! locked; then
-  SCREENSHOT_DIR="$HOME/usr/share/cron/data/scrot/$(date +%Y-%m-%d)"
+  SCREENSHOT_DIR="$HOME/usr/share/cron/panopticon/$(date +%Y-%m-%d)"
   [[ -d "$SCREENSHOT_DIR" ]] || mkdir -p "$SCREENSHOT_DIR"
 
   SCREENSHOT_NUMBER="$(date +%H%M)"

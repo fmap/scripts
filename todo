@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export TODO="$HOME/root/notes.old/todo.txt"
+export TODO="$HOME/root/notes/todo.txt"
 
 add() {
   echo "$@" >> $TODO

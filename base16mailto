@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+class Object
+  def print(device=STDOUT)
+    device << self
+  end
+  def puts(device=STDOUT)
+    self.print
+    ?\n.print
+  end
+end
+
+ARGV[0].chars.map{|x| x.ord.to_s(16)}.join(?%).prepend('mailto:%').puts

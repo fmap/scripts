@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-# Make sure I can execute all of my personal scripts.
+#fix script permissionz
 
-BIN="${BIN:-$HOME/bin}"
-
-for SCRIPT in $BIN/*; do
-  chmod u+x "$SCRIPT" || echo "Error rewriting the permissions of $SCRIPT."
-done
+find "${BIN:-$HOME/bin}" -type f -exec chmod u+x {} ';'

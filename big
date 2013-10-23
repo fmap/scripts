@@ -16,7 +16,7 @@ require 'dzen2' || abort "Requires dzen2"
 MAX_X=$(xrandr | awk '(NR==1) {print $8}')
 MAX_Y=$(xrandr | awk '(NR==1) {print $10}' | tr -d ,)
 
-FONT="Envy Code R:size=44"
+FONT="LetterGothicMono:style=Light:size=44"
 HEIGHT="$MAX_Y"
 WIDTH="$MAX_X"
 BG="#fdf6e3"

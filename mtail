@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+awk '
+  BEGIN { FS="\031"; RS="\030"; OFS=" - " }
+        { print $3, $2                    }
+' "$HOME/var/log/music/play.log" \
+| tail 
