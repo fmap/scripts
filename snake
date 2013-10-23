@@ -1,9 +1,0 @@
-#!/usr/bin/env ruby
-
-class Array
-  def snake
-    map(&:downcase).join('_')
-  end
-end
-
-puts ARGV.snake

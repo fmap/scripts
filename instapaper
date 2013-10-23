@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-API_URL="https://www.instapaper.com/api/add"
-BOOKMARK_URL="$1"
-USERNAME="me@vikramverma.com"
-PASSWORD="$(cat "$HOME/.security/instapaper/vikramverma.pass")" # This quoting doesn't break anything!
-
-curl --data "username=${USERNAME}&password=${PASSWORD}&url=${BOOKMARK_URL}" "$API_URL"

@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-# outputs a list of user-installed packages (ArchLinux)
-
-comm -23 <(pacman -Qeq) <(pacman -Qgq base base-devel | sort)
