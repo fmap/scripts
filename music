@@ -1,18 +1,30 @@
 #!/usr/bin/env bash
 
-#root()
-[[ -d /mnt/usb0/home/ ]] \
-  && ROOT=/mnt/usb0/home \
-  || ROOT="$HOME"
-ROOT="$ROOT/usr/share/music/."
+root() {
+  [[ -d /mnt/usb0/home ]] \
+    && local home=/mnt/usb0/home \
+    || local home=$HOME
+  echo "$home/usr/share/music/."
+}
 
-#mode()
-[[ "$1" == -s ]] \
-  && { mode=shuf; shift; } \
-  || mode=sort
+ROOT="$(root)"
 
-find "$ROOT" -type f -print0 \
-  | grep -Eazi "${@:-*}" \
-  | grep -Eazi '\.(m4a|flac|mp3)$' \
-  | $mode -z \
-  | xargs -0 play 
+mode() {
+  if [[ $1 == "-s" ]]; then
+    echo "shuf"; return 0
+  else
+    echo "sort"; return 1
+  fi
+}
+
+if [[ -z "$*" ]]; then
+  find "$ROOT" -type d -mindepth 2 -maxdepth 2 \
+    | sed "s'$ROOT/''"
+else
+  mode=$(mode $*) && shift
+  find "$ROOT" -type f -print0 \
+    | grep -Eazi "${@:-*}" \
+    | grep -Eazi '\.(m4a|flac|mp3)$' \
+    | $mode -z \
+    | xargs -0 play 
+fi
