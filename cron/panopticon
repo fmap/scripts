@@ -9,7 +9,7 @@ screen() {
 }
 
 cam() {
-  ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -t 1 -ss 00:00:01 -f mjpeg lol.jpg
+  ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -t 1 -ss 00:00:01 -f mjpeg "$@"
 }
 
 if ! locked; then
@@ -19,5 +19,5 @@ if ! locked; then
 
   [[ -d "$dir" ]] || mkdir -p "$dir"
   screen "${prefix}_screen.png"
-  cam "${prefix}_cam.png"
+  cam "${prefix}_cam.jpg"
 fi
