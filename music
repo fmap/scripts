@@ -18,8 +18,9 @@ mode() {
 }
 
 if [[ -z "$*" ]]; then
-  find "$ROOT" -type d -mindepth 2 -maxdepth 2 \
-    | sed "s'$ROOT/''"
+  find "$ROOT" -mindepth 2 -maxdepth 2 -type d \
+    | sed "s'$ROOT/''" \
+    | sort
 else
   mode=$(mode $*) && shift
   find "$ROOT" -type f -print0 \
