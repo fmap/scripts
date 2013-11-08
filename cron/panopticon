@@ -4,10 +4,20 @@ locked() {
   ps aux | grep -v grep | grep -q slock
 }
 
-if ! locked; then
-  SCREENSHOT_DIR="$HOME/usr/share/cron/panopticon/$(date +%Y-%m-%d)"
-  [[ -d "$SCREENSHOT_DIR" ]] || mkdir -p "$SCREENSHOT_DIR"
+screen() {
+  DISPLAY=':0' scrot -m "$@"
+}
 
-  SCREENSHOT_NUMBER="$(date +%H%M)"
-  DISPLAY=':0' scrot "${SCREENSHOT_DIR}/${SCREENSHOT_NUMBER}.png"
+cam() {
+  ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -t 1 -ss 00:00:01 -f mjpeg lol.jpg
+}
+
+if ! locked; then
+  dir="$HOME/usr/share/cron/panopticon/$(date +%Y-%m-%d)"
+  num="$(date +%H%M)"
+  prefix="$dir/$num"
+
+  [[ -d "$dir" ]] || mkdir -p "$dir"
+  screen "${prefix}_screen.png"
+  cam "${prefix}_cam.png"
 fi
