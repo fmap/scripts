@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 root() {
-  [[ -d /mnt/usb0/home ]] \
-    && local home=/mnt/usb0/home \
-    || local home=$HOME
-  echo "$home/usr/share/music/."
+  [[ -d /mnt/media/music ]] \
+    && local share=/mnt/media/ \
+    || local share=$HOME/usr/share
+  echo "$share/music/."
 }
 
 ROOT="$(root)"
