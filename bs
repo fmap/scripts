@@ -15,54 +15,39 @@ exterminate() {
 xmonad() {
   if [[ "$1" == "--restart" ]]; then
     exterminate "status.sh" "dzen" 
-    "$HOME/.cabal/bin/xmonad" --restart;
+    shift; "$HOME/.cabal/bin/xmonad" --restart $@;
   else
-    "$HOME/.cabal/bin/xmonad" "$@";
+    "$HOME/.cabal/bin/xmonad" $@;
   fi
 }
 
 wallpaper() {
-  local resolution="$1"
   local wallpaper="sleep_of_reason.jpg"
-  feh --bg-fill "$HOME/usr/share/wallpapers/$resolution/$wallpaper"
+  for res in $@; do 
+    echo -n "$HOME/usr/share/wallpapers/$res/$wallpaper "
+  done | xargs feh --bg-fill
 }
 
-edp() {
+EDP() {
   xrandr --output eDP1 "$@";
 }
 
-dp1() {
+DP1() {
   xrandr --output DP1 "$@";
 }
 
-_dp1() {
-  # intel drivers are borked, we must trick them
-  local line="$(cvt $1 $2 | grep -i modeline | sed -r 's/^\w+//')"
-  local mode="$(cut -d\  -f1 <<<$line)"
-  xrandr --newmode $line
-  xrandr --addmode "DP1" $mode
-  xrandr --output "DP1" --mode $mode
-} 
-
 [[ "$0" == "bash" ]] && return
 
-case "$1" in
-  desk)
-    xkb -swap; 
-    _dp1 1920 1080;
-    dp1 --primary;
-    edp --auto --right-of DP1;
-    wallpaper "1920x1080";
-    xmonad --restart;
-    ;;
-  lap)
-    xkb; 
-    edp --mode "1366x768" --rotate normal;
-    dp1 --off;
-    wallpaper "1366x768";
-    xmonad --restart;
-    ;;
-  *)
-    echo "$0 [room|lap]";
-    ;;
-esac
+if `xrandr | grep -qE '^DP1 connected'` ; then
+  xkb -swap;
+  DP1 --primary --auto;
+  EDP --auto --right-of DP1;
+  wallpaper '1920x1080' '1366x768';
+  xmonad --restart;
+else
+  xkb; 
+  EDP --auto --primary;
+  DP1 --off;
+  wallpaper '1366x768';
+  xmonad --restart;
+fi
