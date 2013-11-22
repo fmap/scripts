@@ -12,7 +12,7 @@ decode() {
 
 _cc() {
   for encoded in "${CC[@]}"; do
-    echo -n "-cc $(decode $encoded) "
+    echo -n "-c $(decode $encoded) "
   done
 }
 
