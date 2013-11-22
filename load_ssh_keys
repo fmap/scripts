@@ -1,16 +1,6 @@
 #!/usr/bin/env bash
 
-listing_matches?() {
-  ssh-add -l | grep -qPi "$@"
-}
-
-loaded_keys() {
-  ssh-add -l | grep -Po "$HOME/.ssh/id_[^\. ]*" | sort
-}
-
-all_keys() {
-  find $HOME/.ssh -name 'id_*'  | grep -Ev '.pub$' | sort
-}
+source "$HOME/bin/lib/ssh"
 
 if listing_matches? 'could not open a connection'; then
   echo "Either the daemon isn't running, or it hasn't been configured properly."
@@ -19,5 +9,5 @@ if listing_matches? 'could not open a connection'; then
   $0
 else
   echo "The daemon is running, loading remaining identities (if any.)"
-  diff <(loaded_keys) <(all_keys) | awk '/^>/{print $2}' | xargs -r ssh-add
+  missing_keys | awk '/^>/{print $2}' | xargs -r ssh-add
 fi

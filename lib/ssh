@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+listing_matches?() {
+  ssh-add -l | grep -qPi "$@"
+}
+
+loaded_keys() {
+  ssh-add -l | grep -Po "$HOME/.ssh/id_[^\. ]*" | sort 
+}
+
+all_keys() {
+  find $HOME/.ssh -name 'id_*'  | grep -Ev '.pub$' | sort
+}
+
+missing_keys() {
+  diff <(loaded_keys) <(all_keys);
+}
+
+all_loaded?() {
+  [[ `missing_keys | wc -l` -eq 0 ]]
+}

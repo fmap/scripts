@@ -1,18 +1,8 @@
 #!/usr/bin/env bash
 
-loaded_keys() {
-  ssh-add -l | grep -Po "$HOME/.ssh/id_[^\. ]*" | sort 
-}
+source "$HOME/bin/lib/ssh"
 
-all_keys() {
-  find $HOME/.ssh -name 'id_*'  | grep -Ev '.pub$' | sort
-}
-
-missing?() {
-  diff <(loaded_keys) <(all_keys) | wc -l;
-}
-
-while ((`missing?`!=0)); do
+while ! `all_loaded?`; do
   sleep 20
 done
 
