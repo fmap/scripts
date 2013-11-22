@@ -17,7 +17,7 @@ if listing_matches? 'could not open a connection'; then
   eval `ssh-agent`
   echo "Let's try again."
   $0
-elif true; then
+else
   echo "The daemon is running, loading remaining identities (if any.)"
   diff <(loaded_keys) <(all_keys) | awk '/^>/{print $2}' | xargs -r ssh-add
 fi
