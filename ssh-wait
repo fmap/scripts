@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
 
-loaded?() {
-  ssh-add -l | grep -qPi '(?:[a-f0-9]{2}:?){16}'
+loaded_keys() {
+  ssh-add -l | grep -Po "$HOME/.ssh/id_[^\. ]*" | sort 
 }
 
-while ! loaded?; do
-  sleep 20;
+all_keys() {
+  find $HOME/.ssh -name 'id_*'  | grep -Ev '.pub$' | sort
+}
+
+missing?() {
+  diff <(loaded_keys) <(all_keys) | wc -l;
+}
+
+while ((`missing?`!=0)); do
+  sleep 20
 done
 
 exit 0
