@@ -1,1 +1,1 @@
-sudo mount -t cifs //tau.vikramverma.com/media /mnt/media/ -o credentials=~/.security/samba/tau.password 
+sshfs tau:/media/woody/home/usr/share/ /mnt/media
