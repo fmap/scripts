@@ -24,10 +24,8 @@ adjustFont() {
 
 [[ $0 == "bash" ]] && return
 
-if [[ "$TERM" =~ "rxvt-unicode" ]]; then
+if [[ -n "$1" ]]; then
   adjustFont font       710 "$1"
   adjustFont boldFont   711 "$1"
   adjustFont italicFont 712 "$1"
-else
-  echo 'This script is for rxvt-unicode. <http://software.schmorp.de/pkg/rxvt-unicode.html>' 2>&1
 fi
