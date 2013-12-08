@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 xkb() {
-  setxkbmap -option &&
-  setxkbmap -option caps:escape && 
-  [[ "$1" == "-swap" ]] && setxkbmap -option altwin:swap_alt_win;
+  setxkbmap -option
+  eval `grep setxkbmap ~/.xinitrc`
+  [[ "$1" == "swap" ]] && setxkbmap -option altwin:swap_alt_win
 }
 
 exterminate() { 
