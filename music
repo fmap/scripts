@@ -27,5 +27,5 @@ else
     | grep -Eazi "${@:-*}" \
     | grep -Eazi '\.(m4a|flac|mp3)$' \
     | $mode -z \
-    | xargs -0 play 
+    | xargs -0 repeat play 
 fi
