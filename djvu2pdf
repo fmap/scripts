@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ddjvu -format=pdf "$1" "$2"
