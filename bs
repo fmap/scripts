@@ -3,7 +3,7 @@
 xkb() {
   setxkbmap -option
   eval `grep setxkbmap ~/.xinitrc`
-  [[ "$1" == "swap" ]] && setxkbmap -option altwin:swap_alt_win
+  [[ "$1" == "-swap" ]] && setxkbmap -option altwin:swap_alt_win
 }
 
 exterminate() { 
@@ -39,10 +39,10 @@ DP1() {
 [[ "$0" == "bash" ]] && return
 
 if `xrandr | grep -qE '^DP1 connected'` ; then
-  xkb -swap;
-  DP1 --primary --auto;
-  EDP --auto --right-of DP1;
-  wallpaper '1920x1080' '1366x768';
+  xkb;
+  EDP --auto --primary --left-of DP1;
+  DP1 --mode 1024x768;
+  wallpaper  '1366x768' '1920x1080';
   xmonad --restart;
 else
   xkb; 
