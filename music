@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 root() {
-  [[ -d /mnt/media/music ]] \
-    && local share=/mnt/media/ \
-    || local share=$HOME/usr/share
+  [[ -d ~/mnt/media/music ]] \
+    && local share=~/mnt/media/ \
+    || local share=~/usr/share
   echo "$share/music/."
 }
 
