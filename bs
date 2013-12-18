@@ -2,7 +2,7 @@
 
 xkb() {
   setxkbmap -option
-  eval `grep setxkbmap ~/.xinitrc`
+  eval `grep xkbcomp ~/.xinitrc`
   [[ "$1" == "-swap" ]] && setxkbmap -option altwin:swap_alt_win
 }
 
