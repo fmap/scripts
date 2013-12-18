@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 # play music
   
-mproperty() { 
+mproperty′() { 
   mutagen-inspect "$2" | awk -F= "/$1/ {print \$2}" | sed q
+}
+
+mproperty() {
+  P="$(mproperty′ "$1" "$2")"
+  [[ -n $P ]] && echo $P || echo "N.A.";
 }
 
 scrobble() {
