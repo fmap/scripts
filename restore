@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+case $1 in
+  zathura)
+    <~/.local/share/zathura/state xargs -I_ zathura _ &
+  ;;
+  surf)
+    <~/.surf/state xargs -I_ surf _ &
+  ;;
+esac

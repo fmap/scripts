@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+surf::urls() {
+  xwininfo -root -tree \
+    | awk '/Surf/{print $1}' \
+    | xargs -I{} xprop -id {} _SURF_URI \
+    | grep -o 'http[^"]*'
+};
+
+surf::open() {
+  ps aux | grep -q ' surf '
+}
+
+zathura::open() {
+  ps aux | grep -q ' zathura '
+};
+
+zathura::files() {
+  local h="$HOME/.local/share/zathura/history"
+  xwininfo -root -tree \
+    | awk '/pdf.*zathura/{print $1}' \
+    | xargs -I{} xprop -id {} WM_NAME \
+    | cut -d\" -f2 \
+    | xargs -I {} grep -Po '(?<=\[)[^\[]*{}[^\]]*(?=\])' "$h"
+};
+
+[ surf::open    ] && surf::urls     > ~/.surf/state
+[ zathura::open ] && zathura::files > ~/.local/share/zathura/state
