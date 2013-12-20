@@ -2,9 +2,13 @@
 
 case $1 in
   zathura)
-    <~/.local/share/zathura/state xargs -I_ zathura _ &
+    while read pdf; do
+      zathura $pdf &
+    done <~/.local/share/zathura/state 
   ;;
   surf)
-    <~/.surf/state xargs -I_ surf _ &
+    while read url; do
+      surf $url &
+    done <~/.surf/state
   ;;
 esac
