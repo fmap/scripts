@@ -10,11 +10,11 @@ surf::urls() {
 };
 
 surf::open() {
-  ps aux | grep -q ' surf '
+  psgrep ' surf ' &>/dev/null
 }
 
 zathura::open() {
-  ps aux | grep -q ' zathura '
+  psgrep ' zathura ' &>/dev/null
 };
 
 zathura::files() {
@@ -26,5 +26,6 @@ zathura::files() {
     | xargs -I {} grep -Po '(?<=\[)[^\[]*{}[^\]]*(?=\])' "$h"
 };
 
-[ surf::open    ] && surf::urls     > ~/.surf/state
-[ zathura::open ] && zathura::files > ~/.local/share/zathura/state
+
+surf::open && (surf::urls > ~/.surf/state)
+zathura::open && (zathura::files > ~/.local/share/zathura/state)
