@@ -20,10 +20,7 @@ zathura::open() {
 zathura::files() {
   local h="$HOME/.local/share/zathura/history"
   xwininfo -root -tree \
-    | awk '/pdf.*zathura/{print $1}' \
-    | xargs -I{} xprop -id {} WM_NAME \
-    | cut -d\" -f2 \
-    | xargs -I {} grep -Po '(?<=\[)[^\[]*{}[^\]]*(?=\])' "$h"
+    | awk -F\" '/home.*zathura/{print $2}'
 };
 
 
