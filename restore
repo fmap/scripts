@@ -3,12 +3,12 @@
 case $1 in
   zathura)
     while read pdf; do
-      zathura $pdf &
+      zathura "$pdf" &
     done <~/.local/share/zathura/state 
   ;;
   surf)
     while read url; do
-      surf $url &
+      surf "$url" &
     done <~/.surf/state
   ;;
 esac
