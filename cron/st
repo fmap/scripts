@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+# hackish dns record updater for .st NICs
+# todo add exceptions so cron can tell me interesting stuff
+
+%W|rubygems mechanize|.map &method(:require)
+
+secret = eval File.read(ENV["HOME"]+"/.security/dns/rationali.st.pass")
+
+def remote_ip
+ Net::HTTP.get(URI.parse %Q|http://ip-echo.appspot.com|).chomp
+end
+
+agent = Mechanize.new { |a| a.verify_mode = OpenSSL::SSL::VERIFY_NONE }
+
+agent.get('https://www.nic.st')
+
+agent.page.form_with(name: 'loginform') do |form|
+  form.varLogin    = secret[:username]
+  form.varPassword = secret[:password]
+end.submit
+
+dns_form_url = "http://www.nic.st/account/dns/advanced/#{secret[:domain]}"
+
+agent.get(dns_form_url)
+agent.page.form_with(action: dns_form_url) { |form| form.ip0 = form.ip2 = form.ip3 = remote_ip }.submit
