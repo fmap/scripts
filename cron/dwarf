@@ -3,12 +3,16 @@
 export DISPLAY=:0
 export PATH=/usr/bin:$HOME/bin
 
-surf::urls() {
+property() {
   xwininfo -root -tree \
-    | awk '/Surf/{print $1}' \
-    | xargs -I{} xprop -id {} _SURF_URI \
-    | grep -o 'http[^"]*'
-};
+    | awk -F\" "/$1/{print \$1}" \
+    | xargs -I{} xprop -id {} "$2" \
+    | awk -F\" '$0!~/not found/{print $2}'
+}; 
+
+surf::urls() {
+  property "Surf" "_SURF_URI"
+}
 
 surf::open() {
   psgrep ' surf ' &>/dev/null
@@ -19,9 +23,7 @@ zathura::open() {
 };
 
 zathura::files() {
-  local h="$HOME/.local/share/zathura/history"
-  xwininfo -root -tree \
-    | awk -F\" '/home.*zathura/{print $2}'
+  property "Zathura" "_ZATHURA_FILEPATH"
 };
 
 
