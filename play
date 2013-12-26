@@ -2,7 +2,7 @@
 # play music
   
 mproperty′() { 
-  mutagen-inspect "$2" | awk -F= "/$1/ {print \$2}" | sed q
+  mutagen-inspect "$2" | awk -F= "/^($1)/ {print \$2}" | sed q
 }
 
 mproperty() {
