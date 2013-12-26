@@ -1,6 +1,0 @@
-#!/bin/bash
- 
-INPUT=$1
-[[ -n "$2" ]] && OUTPUT=$2 || OUTPUT=${INPUT%.*}.eps
- 
-inkscape --export-text-to-path --export-bbox-page --without-gui --file=$INPUT --export-eps=$OUTPUT &> /dev/null

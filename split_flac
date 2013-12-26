@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-FLAC="$1"
-CUE="$2"
-
-shntool split -o flac "$FLAC" -f "$CUE" -t "%n %t"

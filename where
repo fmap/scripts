@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-[[ -d "$1" ]] && { P="$1"; shift; }
-find "${P:-.}" | grep "$@"
