@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH=/usr/bin:$HOME/bin
+
 log() {
   ( date "+$0: %c" &&
     $@
