@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 #fix script permissionz
 
-find "${BIN:-$HOME/bin}" -type f -exec chmod u+x {} ';'
+find "${BIN:-$HOME/bin}" -type f | grep -vE '.git|.*sw*' | xargs chmod u+x
