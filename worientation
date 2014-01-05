@@ -1,0 +1,6 @@
+#!/bin/bash
+#specify wacom orientation
+
+xsetwacom --list devices \
+  | grep -Po '(?<=id: )\d+' \
+  | xargs -I_ xsetwacom --set _ Rotate ${1:-cw}
