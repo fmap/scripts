@@ -1,0 +1,20 @@
+#!/bin/bash
+#get related artists' tracks
+
+related "$@" | sed 's/ http.*$//' | while read ar; do
+  ftrack "$ar" | while read ln; do
+    dl="$(grep -oP 'https?://[^ ]*'  <<<"$ln")"
+    tr="$(sed "s/^$ar - //;s' $dl''" <<<"$ln")"
+    fn="$ar - $tr"
+    case $dl in
+      *youtube*)
+        youtube-dl -x --audio-format mp3 --audio-quality 0 -o "$fn.%(ext)s" "$dl" 
+      ;;
+      *freedownloads*)
+        # Assuming MP3 for now..
+        wget -O"$fn.mp3" -c "$dl" 
+      ;;
+    esac
+    id3v2 -a "$ar" -t "$tr" "$fn.mp3"
+  done
+done
