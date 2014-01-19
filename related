@@ -22,14 +22,16 @@ function relatedArtists (name, retrieved) {
 
 function processRelatedResult (result) {
   var name = result['name'];
-  if (seenNames.indexOf(name)==-1) {
-    seenNames.push(name);
+  var idnt = name.toLowerCase();
+  if (seenNames.indexOf(idnt)==-1) {
+    seenNames.push(idnt);
     console.log(name, pageFromName(name));
   } 
   return name;
 };
 
 process.argv.slice(2, process.argv.length).forEach(function(name) {
+  processRelatedResult({name:name});
   relatedArtists(name, function(res) {
     relatedArtists( 
       processRelatedResult(res)
