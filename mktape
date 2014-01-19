@@ -8,13 +8,16 @@ related "$@" | sed 's/ http.*$//' | while read ar; do
     fn="$ar - $tr"
     case $dl in
       *youtube*)
-        youtube-dl -x --audio-format mp3 --audio-quality 0 -o "$fn.%(ext)s" "$dl" 
+        ( youtube-dl -x --audio-format mp3 --audio-quality 0 -o "$fn.%(ext)s" "$dl";
+          id3v2 -a "$ar" -t "$tr" "$fn.mp3"
+        ) &
       ;;
       *freedownloads*)
         # Assuming MP3 for now..
-        wget -O"$fn.mp3" -c "$dl" 
+        ( wget -O"$fn.mp3" -c "$dl";
+          id3v2 -a "$ar" -t "$tr" "$fn.mp3"
+        ) &
       ;;
     esac
-    id3v2 -a "$ar" -t "$tr" "$fn.mp3"
   done
 done
