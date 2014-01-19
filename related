@@ -13,10 +13,10 @@ function relatedArtists (name, retrieved) {
   Spider.scrape({ 
     url: pageFromName(name)
   , cols: 
-        [ { desc: 'name'
-          , sel: '//a[@class="similar-artist"]/div/div/span'
-          }
-        ]
+      [ { desc: 'name'
+        , sel: '//a[@class="similar-artist"]/div/div/span'
+        }
+      ]
   }).addListener('retrieved', retrieved);
 };
 
@@ -37,3 +37,5 @@ process.argv.slice(2, process.argv.length).forEach(function(name) {
     );
   });
 });
+
+// vim:set ft=javascript:
