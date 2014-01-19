@@ -3,8 +3,8 @@
 
 related "$@" | sed 's/ http.*$//' | while read ar; do
   ftrack "$ar" | while read ln; do
-    dl="$(grep -oP 'https?://[^ ]*'  <<<"$ln")"
-    tr="$(sed "s/^$ar - //;s' $dl''" <<<"$ln")"
+    dl="$(grep -oP 'https?://[^ ]*'           <<<"$ln")"
+    tr="$(grep -oP "(?<=$ar - ).+(?= https?)" <<<"$ln")"
     fn="$ar - $tr"
     case $dl in
       *youtube*)
