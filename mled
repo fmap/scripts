@@ -1,3 +1,5 @@
+#!/usr/bin/node-future --harmony
+
 var sys  = require('child_process').exec;
 
 LED = {
@@ -67,7 +69,7 @@ function runStream(stream) {
     setTimeout(function() {
       chr.done || runStream(stream);
     }, 0x3E8);
-  }, chr.value=='-'?3e3:1e3)
+  }, chr.value=='-'?3e2:1e2)
 }; 
 
 process.stdin.resume()
