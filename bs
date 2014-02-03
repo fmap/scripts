@@ -40,8 +40,8 @@ DP1() {
 if `xrandr | grep -qE '^DP1 connected'` ; then
   xkb;
   EDP --off #;
-  DP1 --primary --mode 1024x768;
-  wallpaper  '1366x768' '1920x1080';
+  DP1 --primary --mode 1920x1080;
+  wallpaper  '1920x1080';
   xmonad --restart;
 else
   xkb; 
