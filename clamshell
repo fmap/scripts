@@ -1,0 +1,11 @@
+#!/bin/sh
+#Enable/disable laptop input devices.
+
+xinput | awk -F'[=\t]*' '/Internal Keyboard|bcm5974/{print $3}' | while read id; do
+  case $(xinput list-props $id | awk -F'\t' '/Device Enabled/{print $3}') in
+    0) xinput enable  $id         ;;
+    1) xinput disable $id         ;;
+    *) echo "Unknown state: $id." ;;
+  esac
+done
+
