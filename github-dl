@@ -1,0 +1,6 @@
+#!/bin/sh
+USER="https://github.com/$1"; 
+curl -s $USER?tab=repositories \
+  | awk -F'/' '/Stargazers/{print $3}' \
+  | sed "s,^,$USER/," \
+  | xargs -I, git clone ,
