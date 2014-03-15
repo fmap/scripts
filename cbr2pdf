@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+src="$(grep -qE '^/' <<<"$1" && echo "$1" || echo "$PWD/${1#./}")"
+dst="$(sed 's/cbr$/pdf/' <<< "$src")"
+swd="$(mktemp -d "/tmp/$(basename $0).XXXX")"
+
+cd "$swd" && unrar e "$src" && convert *jpg "$dst" && cd "$cwd" && rm -fr "$swd"
