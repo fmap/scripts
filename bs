@@ -14,9 +14,9 @@ exterminate() {
 xmonad() {
   if [[ "$1" == "--restart" ]]; then
     exterminate "status.sh" "dzen" 
-    shift; "$HOME/.cabal/bin/xmonad" --restart $@;
+    shift; "$HOME/.xmonad/xmonad" --restart $@;
   else
-    "$HOME/.cabal/bin/xmonad" $@;
+    "$HOME/.xmonad/xmonad" $@;
   fi
 }
 
