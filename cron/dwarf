@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 export DISPLAY=:0
-export PATH=/usr/bin:$HOME/bin
+export PATH=/usr/bin:$HOME/bin:$PATH
 
 property() {
   xwininfo -root -tree \
@@ -15,15 +15,15 @@ surf::urls() {
 }
 
 surf::open() {
-  psgrep ' surf ' &>/dev/null
+  psgrep 'surf' &>/dev/null
 }
 
 zathura::open() {
-  psgrep ' zathura ' &>/dev/null
+  psgrep 'zathura' &>/dev/null
 };
 
 zathura::files() {
-  property "Zathura" "_ZATHURA_FILEPATH"
+  property "zathura" "_ZATHURA_FILEPATH"
 };
 
 
