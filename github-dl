@@ -1,6 +1,30 @@
-#!/bin/sh
-USER="https://github.com/$1"; 
-curl -s $USER?tab=repositories \
-  | awk -F'/' '/Stargazers/{print $3}' \
-  | sed "s,^,$USER/," \
-  | xargs -I, git clone ,
+#!/usr/bin/env bash
+
+Endpoint="https://api.github.com"
+
+fail() {
+  echo "$1" 2>&1 && exit 1
+};
+
+listRepositories() {
+  $Curl "$Endpoint/orgs/$1" | 
+    grep -qi 'not found' && local type="users"
+  $Curl "$Endpoint/${type:-orgs}/$1/repos" | 
+    awk -F\" '/full_name/ {print $4}'
+};
+
+while getopts ':u: :p:' Option; do
+  case $Option in
+     u) Username="$OPTARG";;
+     p) Password="$OPTARG";;
+    \?) fail "Invalid option: -$OPTARG";;
+     :) fail "-$OPTARG requires an argument.";;
+  esac
+done; shift $(($OPTIND-1));
+
+while [[ -n "$Username" && -z "$Password" ]]; do
+  echo -n "Password: " && read -s Password && echo &&
+  curl -s -u "$Username:$Password" "$Endpoint" | grep -qi 'bad credentials' && Password=""
+done; Curl="curl -s " && [[ -n "$Username" ]] && Curl="curl -s -u $Username:$Password";
+
+listRepositories "$1" | xargs -I_ git clone git@github.com:_
