@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if `uname -a | grep -q NixOS`; then
+  /run/current-system/sw/bin/man $* | less -R
+else
+  /usr/bin/man $*
+fi
