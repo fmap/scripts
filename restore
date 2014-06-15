@@ -8,7 +8,7 @@ case $1 in
   ;;
   surf)
     while read url; do
-      surf "$url" &
+      ${BROWSER:-surf} "$url" &
     done <~/.surf/state
   ;;
 esac
