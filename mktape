@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #get related artists' tracks
 
 related "$@" | sed 's/ http.*$//' | while read ar; do
