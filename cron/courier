@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export PATH=/usr/bin:$HOME/bin
+export PATH=/usr/bin:$HOME/bin:$PATH
 
 log() {
   ( date "+$0: %c" &&
