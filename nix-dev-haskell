@@ -1,0 +1,21 @@
+#!/bin/sh
+
+name=$(date +%s%N);
+
+while read line; do expr="$expr $line"; done <<EOF; nix-build --expr "$expr" $* && ./result/bin/load-env-$name
+  let
+    originalPkgs = import <nixpkgs> { config.allowUnfree = true; };
+    pkgs = originalPkgs // {
+      haskellPackages = originalPkgs.haskellPackages_ghc763_profiling;
+    };
+    env = pkgs.haskellPackages.ghcWithPackages (hsPkgs :
+      (hsPkgs.callPackage ./default.nix { inherit pkgs; }).build.extraBuildInputs
+    );
+  in pkgs.myEnvFun {
+    name = "$name";
+    buildInputs = [ env ];
+    extraCmds = ''
+      \$(grep export \${env.outPath}/bin/ghc)
+    '';
+  }
+EOF
