@@ -16,6 +16,10 @@ scrobble() {
   echo -n $'\030' >> "$logfile"
 }
 
+set_title() {
+  echo -ne "\033]0;$(basename $0): $1\007"
+}
+
 true; for filename in "$@"; do
   [[ $? == 1 ]] && exit
 
@@ -25,9 +29,11 @@ true; for filename in "$@"; do
   year   () { mproperty 'date|TDRC|day'   "$filename"; }
 
   if test "$(track)" -a "$(artist)" -a "$(album)" -a "$(year)"; then
+    set_title "$(artist) - $(track)"
     echo "$(artist) - $(track)"
     scrobble 
   else
+    set_title
     echo "Unknown: $(basename "$filename")"
 #   don't scrobble
   fi
