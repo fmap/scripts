@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+awk -v "L=$(tput lines)" '{ if (NR%L==0) system("sleep 2"); print }'
