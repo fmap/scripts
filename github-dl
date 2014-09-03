@@ -28,5 +28,10 @@ while [[ -n "$Username" && -z "$Password" ]]; do
 done; Curl="curl -s " && [[ -n "$Username" ]] && Curl="$Curl -u $Username:$Password";
 
 listRepositories "$1" | while read repository; do
-  [[ -d "${repository##*/}" ]] || git clone "git@github.com:$repository"
+  directory="${repository##*/}"; 
+  if [[ -d "$directory" ]]; then
+    cd "$directory" && git pull origin master && cd ..
+  else
+    git clone "git@github.com:$repository"
+  fi
 done
