@@ -1,0 +1,6 @@
+#!/bin/sh
+
+awk '
+  /processor/ { sum += 1  }
+  END         { print sum }
+' /proc/cpuinfo
