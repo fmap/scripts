@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 loaded?() {
-  grep -qE 'wlan|eth|ath|wlp' /proc/net/route
+  grep -qE 'wlan|eth|ath|wlp|enp' /proc/net/route
 }
 
 while ! loaded?; do
