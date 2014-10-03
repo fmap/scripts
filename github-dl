@@ -23,7 +23,7 @@ while getopts ':u: :p:' Option; do
 done; shift $(($OPTIND-1));
 
 while [[ -n "$Username" && -z "$Password" ]]; do
-  echo -n "Password: " && read -s Password && echo &&
+  echo -n "[$(basename $0)] password for $Username: " && read -s Password && echo &&
   curl -s -u "$Username:$Password" "$Endpoint" | grep -qi 'bad credentials' && Password=""
 done; Curl="curl -s " && [[ -n "$Username" ]] && Curl="$Curl -u $Username:$Password";
 
