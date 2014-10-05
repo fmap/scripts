@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-(head -n8; tail -n8)

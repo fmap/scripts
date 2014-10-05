@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-case "$#" in
-  0) bc -lq ;; 
-  *) bc -l <<<"$*" ;;
-esac

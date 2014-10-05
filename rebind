@@ -1,4 +1,0 @@
-sudo killall dhcpcd
-sudo systemctl restart netctl-auto@wlan0
-sleep 4
-sudo dhcpcd

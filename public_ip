@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-# Return the system's current public IP address.
-
-curl ip-echo.appspot.com 2> /dev/null

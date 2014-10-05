@@ -1,3 +1,0 @@
-#!/bin/sh
-
-bc -l <<<$RANDOM/32767

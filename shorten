@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-case "$#" in
-  0) read in ;;
-  *) in="$@" ;;
-esac
-
-curl "http://du.cx/api.php?url=${in}" && echo
