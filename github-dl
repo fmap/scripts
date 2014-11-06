@@ -35,7 +35,7 @@ listRepositories() {
 listRepositories "$1" | while read repository; do
   directory="${repository##*/}"; 
   if [[ -d "$directory" ]]; then
-    cd "$directory" && git pull origin master && cd ..
+    cd "$directory" && git pull origin master; cd ..
   else
     git clone "git@github.com:$repository"
   fi
