@@ -6,13 +6,6 @@ fail() {
   echo "$1" 2>&1 && exit 1
 };
 
-listRepositories() {
-  $Curl "$Endpoint/orgs/$1" | 
-    grep -qi 'not found' && local type="users"
-  $Curl "$Endpoint/${type:-orgs}/$1/repos?per_page=99999" | 
-    awk -F\" '/full_name/ {print $4}'
-};
-
 while getopts ':u: :p:' Option; do
   case $Option in
      u) Username="$OPTARG";;
@@ -26,6 +19,18 @@ while [[ -n "$Username" && -z "$Password" ]]; do
   echo -n "[$(basename $0)] password for $Username: " && read -s Password && echo &&
   curl -s -u "$Username:$Password" "$Endpoint" | grep -qi 'bad credentials' && Password=""
 done; Curl="curl -s " && [[ -n "$Username" ]] && Curl="$Curl -u $Username:$Password";
+
+listRepositories() {
+  IsOrganisation="$($Curl "$Endpoint/orgs/$1" | grep -i 'not found')"
+  if [[ -n $IsOrganisation && $1 == $Username ]]; then
+    Path="user/repos"
+  elif [[ -n $IsOrganisation ]]; then
+    Path="users/$1/repos"
+  else
+    Path="orgs/$1/repos"
+  fi; 
+  $Curl $Endpoint/$Path?per_page=99999 | awk -F\" '/full_name/ {print $4}'
+};
 
 listRepositories "$1" | while read repository; do
   directory="${repository##*/}"; 
