@@ -1,5 +1,1 @@
-#!/usr/bin/env ruby
-# Thriftier version of <https://github.com/mjdominus/util/blob/master/bin/mkpasswd>.
-
-DICT="/usr/share/dict/cracklib-small"
-puts File.read(DICT).split.reject { |w| w =~ /['\.]/ or w.length >= 8 }.shuffle[0..3].map { |w| w.capitalize }.join
+head -c 500 /dev/random | tr -dc a-z0-9A-Z | head -c 128; echo
