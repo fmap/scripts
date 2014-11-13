@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # play music
-  
+
+logdir="$HOME/var/log/music/"; [ ! -d "$logdir" ] && mkdir -p "$logdir"
+logfile="$logdir/play.log"
+
 mproperty′() { 
-  mutagen-inspect "$2" | grep -Ei "$1" | cut -d= -f2 | sed q
+  mutagen-inspect "$2" | strings | grep -Ei "$1" | cut -d= -f2 | sed q
 }
 
 mproperty() {
@@ -11,7 +14,6 @@ mproperty() {
 }
 
 scrobble() {
-  logfile="$HOME/var/log/music/play.log"
   (date +%s; track; artist; album; year) | tr '\n' $'\031' >> "$logfile"
   echo -n $'\030' >> "$logfile"
 }
