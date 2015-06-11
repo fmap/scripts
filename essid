@@ -1,1 +1,0 @@
-iwconfig 2>&1 | awk -F: '/ESSID/{print $2}'

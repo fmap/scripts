@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-TRASH=("$HOME/Desktop" "$HOME/Documents" "$HOME/Downloads" "$HOME/Calibre Library")
-for DIR in "${TRASH[*]}"; do
-  [[ -d "$DIR" ]] && rm -fr "$DIR"
-done

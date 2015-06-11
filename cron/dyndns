@@ -1,7 +1,0 @@
-#!/bin/sh
-
-source "~/.security/dns/vikramverma.com.pass"
-
-for HOSTNAME in '*' '@'; do
-  curl -s "https://dynamicdns.park-your-domain.com/update?host=$HOSTNAME&domain=$DOMAIN&password=$PASSWORD"
-done; echo

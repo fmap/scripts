@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-INPUT="$@"
-pandoc "$INPUT" -o "${INPUT%.md}.pdf"

@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-ghci -v0 <<< ":t $@"

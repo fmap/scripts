@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-source "$HOME/bin/lib/ssh"
-
-while ! `all_loaded?`; do
-  sleep 20
-done
-
-exit 0

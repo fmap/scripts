@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-false; while [[ $? -gt 0 ]]; do $@; done && echo -e '\a'

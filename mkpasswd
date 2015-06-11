@@ -1,1 +1,0 @@
-head -c 500 /dev/random | tr -dc a-z0-9A-Z | head -c 128; echo

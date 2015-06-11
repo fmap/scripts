@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-host "$@" |
-  awk '/has address/ { print $4 }' |
-  xargs -I:address whois :address |
-  #grep -Po '(?<=[Cc]ountry: *).*' |
-  awk -F': *' '/[Cc]ountry:/ { print $2 }'  | 
-  sort -u
