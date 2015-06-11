@@ -1,0 +1,14 @@
+#! /usr/bin/env nix-shell
+#! nix-shell -i zsh -p zsh coreutils gnugrep openssl gawk curl moreutils
+
+#? Usage: fetch-intermediates [<cert>]
+#?
+#? This program reads an X509 certificate from <cert>, and displays all
+#? AIA-described intermediates in its chain. If <cert> is not specified, 
+#? it instead reads from standard input.
+
+set -euf
+
+grep -q '.*--help$' <<< "$*" && { grep '^#?' "$0" | cut -c4-; exit; }
+
+curl -s "$(openssl x509 -noout -text < "${1:-/dev/stdin}" | awk '/CA Issuers/{sub("^.*URI:","");print}')" | ifne openssl x509 -inform der | tee >(ifne $0)
