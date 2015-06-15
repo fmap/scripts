@@ -1,0 +1,15 @@
+#! /usr/bin/env nix-shell
+#! nix-shell -i bash -p bash
+#! nix-shell -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/5e7501cd41ebe17f32c8867f01d1b77f349d17eb.tar.gz
+
+#? Usage: persevere [<command>]
+#?
+#? This program executes <command> repeatedly in its calling environment,
+#? desisting the first time it exits with a value of 0. It then rings the
+#? system bell.
+
+set -euf
+
+[[ "$@" == "--help" ]] && { grep '^#?' "$0" | cut -c4-; exit; }
+
+(false; while [[ $? -gt 0 ]]; do $@; done) && echo -e '\a'
