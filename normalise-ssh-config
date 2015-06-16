@@ -1,0 +1,47 @@
+#! /usr/bin/env nix-shell
+#! nix-shell -i bash -p bash gawk
+#! nix-shell -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/5e7501cd41ebe17f32c8867f01d1b77f349d17eb.tar.gz
+
+#? Usage: normalise-ssh-config [<ssh_config>]
+#?
+#? This program reads a ssh_config(5)-formatted configuration file from
+#? <ssh_config>, and reproduces its entries in ascending lexicographic order of
+#? their Host/Match patterns. If <ssh_config> is not specified, it instead reads
+#? from standard input. When multiple entries share a pattern, their declarations
+#? are concatenated. Redundant declarations are removed, with precedence afforded
+#? to the first to appear in the original file. Declarations prior to the first
+#? Host or Match keyword are reproduced without manipulation.
+#?
+#? Given that the documentation of ssh_config(5) states:
+#?
+#? > Since the first obtained value for each parameter is used, more
+#? > host-specific declarations should be given near the beginning of
+#? > the file, and general defaults at the end.
+#?
+#? This sorting is often insensible, but I've found this useful for working with
+#? configurations that include only simple patterns.
+
+set -euf
+
+[[ "$@" == "--help" ]] && { grep '^#?' "$0" | cut -c4-; exit; }
+
+< "${1:-/dev/stdin}" gawk '
+  BEGIN {
+    PROCINFO["sorted_in"]="@ind_str_asc";
+  }
+  /^(Host|Match)/ {
+    X=$0; next;
+  }
+  (NF && !X) {
+    print; next;
+  }
+  NF {
+    F=$1; $1=""; if (!R[X][F]) R[X][F]=$0;
+  }
+  END {
+    for (X in R) {
+      print X;
+      for (F in R[X]) print "  " F R[X][F];
+    }
+  }
+'
