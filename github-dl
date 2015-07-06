@@ -1,0 +1,179 @@
+#! /usr/bin/env nix-shell
+#! nix-shell -i runghc -p haskellPackages.ghc haskellPackages.wreq haskellPackages.interpolate
+#! nix-shell -p haskellPackages.stringConversions haskellPackages.optparseApplicative git
+#! nix-shell -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/5e7501cd41ebe17f32c8867f01d1b77f349d17eb.tar.gz
+
+{-# OPTIONS_GHC -Wall -Werror  #-}
+{-# LANGUAGE DeriveFunctor     #-}
+{-# LANGUAGE LambdaCase        #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE ViewPatterns      #-}
+{-# LANGUAGE RecordWildCards   #-}
+
+module Main (main) where
+
+-- TODO
+-- Rather than clone private repositories with SSH, use HTTPS and propagate basic authentication.
+-- Interpolate repository name into clone output (for errors, etc.)
+-- Clean up 'getRepositories', it's an ugly wreck of a function.
+
+import Prelude hiding (sequence)
+import Control.Applicative (optional, (<*>), (<$>))
+import Control.Exception (bracket_)
+import Control.Lens ((^.), (^..), (^?), (?~), (&), (^.), (<&>), view, to, set)
+import Control.Monad ((<=<), unless, (>=>))
+import Control.Monad.IO.Class (liftIO)
+import Control.Monad.Trans.Except (ExceptT(runExceptT), throwE)
+import Control.Monad.Trans.Reader (ReaderT, runReaderT, asks)
+import Data.Aeson (Value)
+import Data.Aeson.Lens (key, values, _String, _Bool)
+import Data.Bool (bool)
+import Data.ByteString (ByteString)
+import Data.ByteString.Char8 (hGetLine, pack, unpack)
+import Data.Maybe (isJust, catMaybes)
+import Data.String (IsString)
+import Data.String.Conversions (cs)
+import Data.String.Interpolate.IsString (i)
+import Data.Text (Text)
+import Data.Traversable (sequence)
+import Network.Wreq (Options, Status, checkStatus, Auth, basicAuth, headWith, defaults, auth, responseStatus, statusCode, getWith, responseBody, responseLink, linkURL)
+import Options.Applicative (Parser, strOption, strArgument, short, metavar, execParser, info, footer, ParseError(ShowHelpText), abortOption, long, hidden, (<>))
+import System.Directory (doesDirectoryExist, getCurrentDirectory, setCurrentDirectory)
+import System.Exit (ExitCode(ExitSuccess), exitFailure)
+import System.FilePath (combine)
+import System.IO (hSetEcho, hPutStr, hPutChar, stdin, stderr)
+import System.Process (ProcessHandle, runCommand, waitForProcess)
+
+description :: IsString a => a
+description = [i|
+  This program downloads each of a user or organisation's GitHub repositories
+  into its working directory. When a directory with a given repository's name
+  already exists, we assume it to be an existing checkout, and fetch its remotes
+  instead. Private repositories are supported: specify a <user> and we'll prompt
+  you to authenticate with its password. Private repositories are cloned with SSH,
+  and rely on the calling environment for authentication.
+|]
+
+parseArguments :: Parser (Maybe String, String)
+parseArguments = (,)
+             <$> optional (strOption $ short 'u' <> metavar "<user>")
+             <*> strArgument (metavar "<target>")
+
+don'tCheckStatus :: (Options -> Options)
+don'tCheckStatus = checkStatus ?~ \_ _ _ -> Nothing
+
+readSecret :: IO ByteString
+readSecret = bracket_ (hSetEcho stdin False) (hSetEcho stdin True) (hGetLine stdin)
+
+getAuth :: ByteString -> IO Auth
+getAuth user = do
+  credentials <- basicAuth user <$> bracket_ (hPutStr stderr "Password: ") (hPutChar stderr '\n') readSecret
+  response <- headWith (defaults & auth ?~ credentials & don'tCheckStatus) "https://api.github.com"
+  case response ^. responseStatus . statusCode of { 200 -> return credentials; _ -> getAuth user }
+
+-- Organisations and users have distinct endpoints, but why burden the interface?
+
+data Resource = IsOrganisation ByteString | IsUser ByteString
+
+getTarget :: Resource -> ByteString
+getTarget = \case { IsOrganisation bs -> bs; IsUser bs -> bs }
+
+isSuccessful :: Status -> Bool
+isSuccessful = (==2) . flip div 100 . view statusCode
+
+getStatus :: String -> IO Status
+getStatus = fmap (view responseStatus) <$> headWith (don'tCheckStatus defaults)
+
+classifyTarget :: String -> ExceptT ByteString IO Resource
+classifyTarget (pack -> name) = do
+  (isSuccessful -> isOrganisation, isSuccessful -> isUser) <- liftIO $ (,)
+    <$> getStatus [i|https://api.github.com/orgs/#{name}|]
+    <*> getStatus [i|https://api.github.com/users/#{name}|]
+  unless (isOrganisation || isUser) $ throwE
+    [i|#{name} is neither a user nor an organisation..|]
+  return $ if isOrganisation then IsOrganisation name else IsUser name
+
+data Environment = Environment
+  { envOptions :: Options
+  , envResource :: Resource
+  }
+
+parseHelp :: Parser (a -> a)
+parseHelp = abortOption ShowHelpText (long "help" <> short 'h' <> hidden)
+
+getEnvironment :: ExceptT ByteString IO Environment
+getEnvironment = do
+  (user, target) <- liftIO . execParser $
+    info (parseHelp <*> parseArguments) (footer description)
+  resource <- classifyTarget target
+  optionsA <- sequence (getAuth . pack <$> user) <&> set auth & liftIO
+  return $ Environment (optionsA defaults) resource
+
+-- When using the '/users/:user:/repos' endpoint, private repositories are not
+-- reported, even when the authenticated user has permission to view them. As a
+-- workaround, when we have received credentials, we query '/user/repos' in its
+-- place, ignoring results that do not belong to the specified user. Responses
+-- from 'Unsafe' endpoints need be tested.
+
+data Suspicious a = Safe a | Unsafe a deriving (Functor)
+
+runSuspicious :: Suspicious a -> (Bool, a)
+runSuspicious (Safe a) = (True, a)
+runSuspicious (Unsafe a) = (False, a)
+
+getBaseURL :: (Functor m, Monad m) => ReaderT Environment m (Suspicious ByteString)
+getBaseURL = asks envResource >>= \case
+  IsOrganisation organisation ->
+    return $ Safe [i|https://api.github.com/orgs/#{organisation}/repos|]
+  IsUser name -> asks envOptions <&> isJust . view auth <&> bool
+    (Safe [i|https://api.github.com/users/#{name}/repos|])
+    (Unsafe "https://api.github.com/user/repos")
+
+data Repository = Repository
+  { repoName  :: String
+  , repoOwner :: ByteString
+  , repoURL   :: String
+  }
+
+getRepository :: Value -> Maybe Repository
+getRepository value = do
+  name    <- value ^? key "name" . _String . to (cs :: Text -> String)
+  owner   <- value ^? key "owner" . key "login" . _String . to (cs :: Text -> ByteString)
+  private <- value ^? key "private" . _Bool
+  url     <- value ^? key (if private then "ssh_url" else "clone_url") . _String . to (cs :: Text -> String)
+  Just $ Repository name owner url
+
+getRepositories :: Suspicious ByteString -> ReaderT Environment IO [Repository]
+getRepositories url = do
+  (options, resource) <- (,) <$> asks envOptions <*> asks envResource
+  (isSafe,  response) <- runSuspicious url <&> liftIO . getWith options . unpack & sequence
+  let repositories' = response ^. responseBody ^.. values . to getRepository & catMaybes
+      repositories  = if isSafe then repositories' else filter ((getTarget resource ==) . repoOwner) repositories'
+  case response ^? responseLink "rel" "next" . linkURL of
+    Just next -> (repositories ++) <$> getRepositories (const next <$> url)
+    Nothing -> return repositories
+
+inDirectory :: FilePath -> (IO a -> IO a)
+inDirectory directory action = do
+  original <- getCurrentDirectory
+  bracket_ (setCurrentDirectory directory) (setCurrentDirectory original) action
+
+fetchRepository :: Repository -> IO ProcessHandle
+fetchRepository Repository{..} = do
+  directoryName <- flip combine repoName <$> getCurrentDirectory
+  doesDirectoryExist directoryName >>= bool
+    (runCommand [i|git clone -q #{repoURL}|])
+    (inDirectory directoryName $ runCommand "git fetch -q -p --all")
+
+fetchRepositories :: [Repository] -> IO [ExitCode]
+fetchRepositories = mapM waitForProcess <=< mapM fetchRepository
+
+thenExit :: [ExitCode] -> IO ()
+thenExit = flip unless exitFailure . all (== ExitSuccess)
+
+main :: IO ()
+main = runExceptT getEnvironment
+   >>= either (error . unpack) return
+   >>= runReaderT (getBaseURL >>= getRepositories)
+   >>= (fetchRepositories >=> thenExit)
