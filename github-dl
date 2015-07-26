@@ -39,7 +39,7 @@ import Data.Text (Text)
 import Data.Traversable (sequence)
 import Network.Wreq (Options, Status, checkStatus, Auth, basicAuth, headWith, defaults, auth, responseStatus, statusCode, getWith, responseBody, responseLink, linkURL)
 import Options.Applicative (Parser, strOption, strArgument, short, metavar, execParser, info, footer, ParseError(ShowHelpText), abortOption, long, hidden, (<>))
-import System.Directory (doesDirectoryExist, getCurrentDirectory, setCurrentDirectory)
+import System.Directory (doesDirectoryExist, getCurrentDirectory)
 import System.Exit (ExitCode(ExitSuccess), exitFailure)
 import System.FilePath (combine)
 import System.IO (hSetEcho, hPutStr, hPutChar, stdin, stderr)
@@ -148,23 +148,18 @@ getRepositories :: Suspicious ByteString -> ReaderT Environment IO [Repository]
 getRepositories url = do
   (options, resource) <- (,) <$> asks envOptions <*> asks envResource
   (isSafe,  response) <- runSuspicious url <&> liftIO . getWith options . unpack & sequence
-  let repositories' = response ^. responseBody ^.. values . to getRepository & catMaybes
-      repositories  = if isSafe then repositories' else filter ((getTarget resource ==) . repoOwner) repositories'
+  let repositories = response ^. responseBody ^.. values . to getRepository & catMaybes
+                   & if isSafe then id else filter ((getTarget resource ==) . repoOwner)
   case response ^? responseLink "rel" "next" . linkURL of
     Just next -> (repositories ++) <$> getRepositories (const next <$> url)
     Nothing -> return repositories
 
-inDirectory :: FilePath -> (IO a -> IO a)
-inDirectory directory action = do
-  original <- getCurrentDirectory
-  bracket_ (setCurrentDirectory directory) (setCurrentDirectory original) action
-
 fetchRepository :: Repository -> IO ProcessHandle
 fetchRepository Repository{..} = do
   directoryName <- flip combine repoName <$> getCurrentDirectory
-  doesDirectoryExist directoryName >>= bool
-    (runCommand [i|git clone -q #{repoURL}|])
-    (inDirectory directoryName $ runCommand "git fetch -q -p --all")
+  doesDirectoryExist directoryName >>= runCommand . bool
+    [i|git clone -q #{repoURL}|]
+    [i|git -C #{directoryName} fetch -q -p --all|]
 
 fetchRepositories :: [Repository] -> IO [ExitCode]
 fetchRepositories = mapM waitForProcess <=< mapM fetchRepository
