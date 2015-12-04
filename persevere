@@ -1,6 +1,4 @@
-#! /usr/bin/env nix-shell
-#! nix-shell -i bash -p bash
-#! nix-shell -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/5e7501cd41ebe17f32c8867f01d1b77f349d17eb.tar.gz
+#! /usr/bin/env bash
 
 #? Usage: persevere [<command>]
 #?

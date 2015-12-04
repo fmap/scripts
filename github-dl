@@ -1,9 +1,6 @@
-#! /usr/bin/env nix-shell
-#! nix-shell -i runghc -p haskellPackages.ghc haskellPackages.wreq haskellPackages.interpolate
-#! nix-shell -p haskellPackages.stringConversions haskellPackages.optparseApplicative git
-#! nix-shell -I nixpkgs=https://github.com/NixOS/nixpkgs-channels/archive/5e7501cd41ebe17f32c8867f01d1b77f349d17eb.tar.gz
+#! /usr/bin/env stack
+-- stack --resolver lts-3.13 --install-ghc runghc --package wreq --package interpolate --package string-conversions --package optparse-applicative
 
-{-# OPTIONS_GHC -Wall -Werror  #-}
 {-# LANGUAGE DeriveFunctor     #-}
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -24,7 +21,7 @@ import Control.Exception (bracket_)
 import Control.Lens ((^.), (^..), (^?), (?~), (&), (^.), (<&>), view, to, set)
 import Control.Monad ((<=<), unless, (>=>))
 import Control.Monad.IO.Class (liftIO)
-import Control.Monad.Trans.Except (ExceptT(runExceptT), throwE)
+import Control.Monad.Trans.Except (ExceptT, runExceptT, throwE)
 import Control.Monad.Trans.Reader (ReaderT, runReaderT, asks)
 import Data.Aeson (Value)
 import Data.Aeson.Lens (key, values, _String, _Bool)
